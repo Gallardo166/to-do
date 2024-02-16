@@ -54,21 +54,43 @@ const init = function() {
 
         confirmButton.addEventListener("click", (e) => {
             let taskInfo = getTaskInfo();
-            let task = TaskManager.createTask(taskInfo.title, taskInfo.description, taskInfo.dueDate, taskInfo.priority);
+            let task = TaskManager.createTask(taskInfo.title, taskInfo.description, taskInfo.dueDate, taskInfo.priority, taskInfo.status);
             TaskManager.addTask(task);
 
             loadTasks(todayTaskContainer, "today");
+            enableDelete();
             revealElements(addTaskContainer);
             hideElements(infoModal);
             resetModal();
             e.preventDefault();
+            console.log(TaskManager.tasks);
         });
 
         cancelButton.addEventListener("click", (e) => {
+            loadTasks(todayTaskContainer, "today");
+            enableDelete();
             revealElements(addTaskContainer);
             hideElements(infoModal);
+            if (TaskManager.filterTaskByDate("today").length === 0) {
+                revealElements(noTask);
+            };
             e.preventDefault();
         });
+
+        const enableDelete = function() {
+            Array.from(document.querySelectorAll(".delete")).forEach(button => button.addEventListener("click", (e) => {
+                let taskid = e.target.id.split("-")[1];
+                TaskManager.deleteTask(taskid);
+
+                loadTasks(todayTaskContainer, "today");
+                enableDelete();
+                if (TaskManager.filterTaskByDate("today").length === 0) {
+                    revealElements(noTask);
+                };
+
+                console.log(TaskManager.tasks);
+            }))
+        };
     };
 
     addEvents();
@@ -78,7 +100,7 @@ const init = function() {
     let priority = document.querySelector("#priority");
 
     const getTaskInfo = function() {
-        return { title: taskName.value, description: description.value, dueDate: "today", priority: priority.value };
+        return { title: taskName.value, description: description.value, dueDate: "today", priority: priority.value, status: "not done" };
     };
 
     const resetModal = function() {
@@ -87,20 +109,5 @@ const init = function() {
         priority.value = "";
     };
 };
-
-const addContent = function(container, html) {
-    container.innerHTML += html;
-};
-
-
-const renderTask = function(taskInfo) {
-    return `
-        <div class="task">
-            <p>${taskInfo.taskName}</p>
-            <p>${taskInfo.description}</p>
-            <p>${taskInfo.priority}</p>
-        </div>
-    `;
-}
 
 export default init;

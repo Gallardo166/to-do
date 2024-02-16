@@ -11,13 +11,13 @@ const revealElements = function(container) {
 
 const loadTasks = function(container, filter) {
     container.innerHTML = "";
-    console.log("tests");
     TaskManager.filterTaskByDate(filter).forEach((task) => {
         container.innerHTML += `
             <div class="task">
                 <p>${task.title}</p>
                 <p>${task.description}</p>
                 <p>${task.priority}</p>
+                <button class="delete" id=delete-${task.id}>Delete</button>
             </div>
         `;
     });
