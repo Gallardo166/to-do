@@ -55,7 +55,7 @@ const init = function() {
         confirmButton.addEventListener("click", (e) => {
             let taskInfo = getTaskInfo();
             let task = TaskManager.createTask(taskInfo.title, taskInfo.description, taskInfo.dueDate, taskInfo.priority, taskInfo.status);
-            TaskManager.addTask(task);
+            TaskManager.addTask(task, "projectless", "sectionless");
 
             loadTasks(todayTaskContainer, "today");
             enableDelete();
@@ -63,7 +63,8 @@ const init = function() {
             hideElements(infoModal);
             resetModal();
             e.preventDefault();
-            console.log(TaskManager.tasks);
+
+            console.log(TaskManager.allTasks)
         });
 
         cancelButton.addEventListener("click", (e) => {
@@ -80,15 +81,13 @@ const init = function() {
         const enableDelete = function() {
             Array.from(document.querySelectorAll(".delete")).forEach(button => button.addEventListener("click", (e) => {
                 let taskid = e.target.id.split("-")[1];
-                TaskManager.deleteTask(taskid);
+                TaskManager.deleteTask(TaskManager.getTaskById(taskid));
 
                 loadTasks(todayTaskContainer, "today");
                 enableDelete();
                 if (TaskManager.filterTaskByDate("today").length === 0) {
                     revealElements(noTask);
                 };
-
-                console.log(TaskManager.tasks);
             }))
         };
     };

@@ -1,46 +1,111 @@
 const TaskManager = {
 
-    // project system to be implemented next
-    // alltasks: [
-    //     {
-    //         projectName: project1,
-    //         sections: [
-    //             {
-    //                 sectionName: section1,
-    //                 tasks: [],
-    //             },
-    //             {
-    //                 sectionName: sectionless,
-    //                 tasks: [],
-    //             }
-    //         ]
-    //     },
-    //     {
-    //         projectName: projectless,
-    //         tasks: [],
-    //     }
+    allTasks: [
+        [],
+        {
+            projectName: "projectless",
+            sections: [
+                {
+                    sectionName: "sectionless",
+                    tasks: [],
+                },
+            ],
+        },
+        {
+            projectName: "project1",
+            sections: [
+                {
+                    sectionName: "section1",
+                    tasks: [{task: true}],
+                },
+                {
+                    sectionName: "sectionless",
+                    tasks: [],
+                }
+            ],
+        },
     
-    // ],
+    ],
 
-    tasks: [],
-
-    addTask: function(task) {
-        this.tasks.push(task);
-        task.id = this.tasks.indexOf(task);
+    createProject: function(projectName) {
+        let newProject = {
+            projectName: projectName,
+            sections: [
+                {
+                    sectionName: "sectionless",
+                    tasks: [],
+                },
+            ],
+        };
+        this.allTasks.push(newProject);
     },
 
-    deleteTask: function(id) {
-        this.tasks.splice(id, 1);
-        this.tasks.forEach(task => task.id = this.tasks.indexOf(task))
-    },
-
-    filterTaskByDate: function(filter) {
-        return this.tasks.filter((task) => (task.dueDate === filter));
+    createSection: function(projectName, sectionName) {
+        this.getProject(projectName).sections.push({
+            sectionName: sectionName,
+            tasks: []
+        });
     },
 
     createTask: function(title, description, dueDate, priority, status) {
         return { title, description, dueDate, priority, status };
     },
+
+    addTask: function(task, projectName, sectionName) {
+        this.allTasks[0].push(task);
+        this.getSection(projectName, sectionName).tasks.push(task);
+        this.resetTaskId();
+    },
+
+    containsObject: function(object, array) {
+        for (let i=0; i<array.length; i++) {
+            if (JSON.stringify(array[i]) === JSON.stringify(object)) {return true}
+        }
+        return false;
+    },
+
+    getTaskById: function(id) {
+        return this.allTasks[0][id];
+    },
+
+    getProject: function(projectName) {
+        return this.allTasks.filter((project) => (project.projectName === projectName))[0];
+    },
+
+    getSection: function(projectName, sectionName) {
+        return this.getProject(projectName).sections.filter((section) => (section.sectionName === sectionName))[0];
+    },
+
+    getTaskProjectAndSection: function(task) {
+        for (let i=1; i<this.allTasks.length; i++) {
+            for (let j=0; j<this.allTasks[i].sections.length; j++) {
+                if (this.containsObject(task, this.allTasks[i].sections[j].tasks)) {
+                    return {projectName: this.allTasks[i].projectName, sectionName: this.allTasks[i].sections[j].sectionName};
+                };
+            };
+        };
+    },
+
+    resetTaskId: function() {
+        this.allTasks[0].forEach(task => task.id = this.allTasks[0].indexOf(task));
+    },
+
+    deleteTask: function(task) {
+        this.allTasks[0].splice(task.id, 1);
+        let { projectName , sectionName } = this.getTaskProjectAndSection(task);''
+        this.getSection(projectName, sectionName).tasks.splice(task.id, 1);
+        this.resetTaskId();
+    },
+
+    filterTaskByDate: function(date) {
+        return this.allTasks[0].filter((task) => (task.dueDate === date));
+    },
+
+    moveTask: function(task, targetProjectName, targetSectionName) {
+        this.deleteTask(task);
+        this.addTask(task, targetProjectName, targetSectionName);
+    },
+
 };
 
 export default TaskManager;
