@@ -1,6 +1,6 @@
 import PlusIcon from "./images/plus.svg";
 import TaskManager from "./tasks";
-import { hideElements, revealElements, loadTasks } from "./dom";
+import { hideElements, revealElements, removeElements, loadTasks } from "./dom";
 import pubsub from "./pubsub";
 
 const init = function() {
@@ -11,18 +11,18 @@ const init = function() {
             <div id="today-task-container"></div>
             <div id="add-task-container">
                 <button id="add-task-button">
-                    <img src="${PlusIcon}" alt="Plus">
-                    <p>Add task</p>
+                    <img id="add-task-button-img" src="${PlusIcon}" alt="Plus">
+                    <p id="add-task-label">Add task</p>
                 </button>
             </div>
-            <div id="info-modal" class="hidden">
+            <div id="info-modal" class="removed">
                 <form id="task-info-modal">
                     <input id="task-name" type="text" placeholder="Task name" />
                     <input id="description" type="text" placeholder="Description" />
                     <label for="priority">Priority</label>
                     <input id="priority" type="number" min="1" max="5" />
-                    <button id="cancel-button">Cancel</button>
-                    <button id="confirm-button">OK</button>
+                    <button id="cancel-add-task">Cancel</button>
+                    <button id="confirm-add-task">OK</button>
                 </form>
             </div>
             <div id="no-task">
@@ -38,8 +38,8 @@ const init = function() {
     renderTodayPageEmpty();
 
     const addTaskButton = document.querySelector("#add-task-button");
-    const confirmButton = document.querySelector("#confirm-button");
-    const cancelButton = document.querySelector("#cancel-button");
+    const confirmButton = document.querySelector("#confirm-add-task");
+    const cancelButton = document.querySelector("#cancel-add-task");
     const addTaskContainer = document.querySelector("#add-task-container");
     const infoModal = document.querySelector("#info-modal");
     const todayTaskContainer = document.querySelector("#today-task-container");
@@ -47,8 +47,8 @@ const init = function() {
 
     const addEvents = function() {
         addTaskButton.addEventListener("click", () => {
-            hideElements(addTaskContainer);
-            hideElements(noTask);
+            removeElements(addTaskContainer);
+            removeElements(noTask);
             revealElements(infoModal);
         });
 
@@ -60,7 +60,7 @@ const init = function() {
             loadTasks(todayTaskContainer, "today");
             enableDelete();
             revealElements(addTaskContainer);
-            hideElements(infoModal);
+            removeElements(infoModal);
             resetModal();
             e.preventDefault();
 
@@ -68,10 +68,9 @@ const init = function() {
         });
 
         cancelButton.addEventListener("click", (e) => {
-            loadTasks(todayTaskContainer, "today");
-            enableDelete();
             revealElements(addTaskContainer);
-            hideElements(infoModal);
+            resetModal();
+            removeElements(infoModal);
             if (TaskManager.filterTaskByDate("today").length === 0) {
                 revealElements(noTask);
             };
@@ -79,7 +78,7 @@ const init = function() {
         });
 
         const enableDelete = function() {
-            Array.from(document.querySelectorAll(".delete")).forEach(button => button.addEventListener("click", (e) => {
+            Array.from(document.querySelectorAll(".delete-today")).forEach(button => button.addEventListener("click", (e) => {
                 let taskid = e.target.id.split("-")[1];
                 TaskManager.deleteTask(TaskManager.getTaskById(taskid));
 

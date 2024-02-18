@@ -11,20 +11,6 @@ const TaskManager = {
                 },
             ],
         },
-        {
-            projectName: "project1",
-            sections: [
-                {
-                    sectionName: "section1",
-                    tasks: [{task: true}],
-                },
-                {
-                    sectionName: "sectionless",
-                    tasks: [],
-                }
-            ],
-        },
-    
     ],
 
     createProject: function(projectName) {
@@ -95,6 +81,10 @@ const TaskManager = {
         let { projectName , sectionName } = this.getTaskProjectAndSection(task);''
         this.getSection(projectName, sectionName).tasks.splice(task.id, 1);
         this.resetTaskId();
+    },
+
+    deleteProject: function(projectName) {
+        this.allTasks.splice(this.allTasks.indexOf(this.getProject(projectName)), 1);
     },
 
     filterTaskByDate: function(date) {

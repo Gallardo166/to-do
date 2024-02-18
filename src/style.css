@@ -2,14 +2,8 @@ body {
     display: flex;
 }
 
-.hidden {
-    width: 0;
-    height: 0;
-    overflow: hidden;
-}
-
 #sidebar {
-    width: 120px;
+    width: 140px;
     overflow: hidden;
 }
 
@@ -36,4 +30,13 @@ img {
 .add-task-button {
     display: flex;
     align-items: center;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+
+.removed {
+    display: none;
 }
