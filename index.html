@@ -23,13 +23,27 @@
                 <img src="564e6b52b278f697ca77.svg" alt="Dashboard">
                 <p>Dashboard</p>
             </button>
-            <button id="projects" class="menu">
+            <div id="projects-header" class="menu">
                 <p>My Projects</p>
+                <button id="add-project">
+                    <p id="add-project-img">+</p>
+                </button>
+            </div>
+            <div id="projects-list">
+            </div>
+            <div id="add-project-modal" class="removed">
+                <form>
+                    <input id="project-name" type="text" placeholder="Project Name" />
+                    <button id="confirm-add-project">Add</button>
+                    <button id="cancel-add-project">Cancel</button>
+                </form>
+            </div>
 
-            </button>
         </div>
         <div id="main-content">
-            <img src="7368ae2bf68dfc6d2fa3.svg" class="hidden">
+            <button id="sidebar-toggle-open" class="hidden">
+                <img src="7368ae2bf68dfc6d2fa3.svg">
+            </button>
             <div id="today-content">
             </div>
         </div>
