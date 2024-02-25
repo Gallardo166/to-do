@@ -15,7 +15,7 @@ const TaskManager = {
 
     createProject: function(projectName) {
         let newProject = {
-            projectName: projectName,
+            projectName: `${projectName}`,
             sections: [
                 {
                     sectionName: "sectionless",
@@ -24,6 +24,7 @@ const TaskManager = {
             ],
         };
         this.allTasks.push(newProject);
+        console.log(this.allTasks);
     },
 
     createSection: function(projectName, sectionName) {
@@ -89,6 +90,10 @@ const TaskManager = {
 
     filterTaskByDate: function(date) {
         return this.allTasks[0].filter((task) => (task.dueDate === date));
+    },
+
+    filterTaskBySection: function(projectName, sectionName) {
+        return this.getSection(projectName, sectionName).tasks;
     },
 
     moveTask: function(task, targetProjectName, targetSectionName) {

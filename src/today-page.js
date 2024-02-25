@@ -1,12 +1,14 @@
 import PlusIcon from "./images/plus.svg";
 import TaskManager from "./tasks";
-import { hideElements, revealElements, removeElements, loadTasks } from "./dom";
+import { hideElements, revealElements, removeElements, loadTasksByDate } from "./dom";
 import pubsub from "./pubsub";
 
 const init = function() {
     const renderTodayPageEmpty = function() {
+        const projectContent = document.querySelector("#project-content");
+        projectContent.innerHTML = "";
         const todayContent = document.querySelector("#today-content");
-        todayContent.innerHTML += `
+        todayContent.innerHTML = `
             <h1>Today</h1>
             <div id="today-task-container"></div>
             <div id="add-task-container">
@@ -57,7 +59,7 @@ const init = function() {
             let task = TaskManager.createTask(taskInfo.title, taskInfo.description, taskInfo.dueDate, taskInfo.priority, taskInfo.status);
             TaskManager.addTask(task, "projectless", "sectionless");
 
-            loadTasks(todayTaskContainer, "today");
+            loadTasksByDate(todayTaskContainer, "today");
             enableDelete();
             revealElements(addTaskContainer);
             removeElements(infoModal);
@@ -82,7 +84,7 @@ const init = function() {
                 let taskid = e.target.id.split("-")[1];
                 TaskManager.deleteTask(TaskManager.getTaskById(taskid));
 
-                loadTasks(todayTaskContainer, "today");
+                loadTasksByDate(todayTaskContainer, "today");
                 enableDelete();
                 if (TaskManager.filterTaskByDate("today").length === 0) {
                     revealElements(noTask);

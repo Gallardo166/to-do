@@ -1,5 +1,7 @@
 import { hideElements, revealElements, removeElements, loadTasks, loadProjects } from "./dom";
 import TaskManager from "./tasks";
+import initProjectPage from "./project-page";
+import initTodayPage from "./today-page";
 
 const closeSidebar = function() {
     const sidebar = document.querySelector("#sidebar");
@@ -43,10 +45,12 @@ const addEvents = function() {
 
     confirmAddProjectButton.addEventListener("click", (e) => {
         removeElements(addProjectModal);
-        projectName.value = "";
         TaskManager.createProject(projectName.value);
         loadProjects(projectList);
         enableDelete();
+        makeProjectsClickable();
+        initProjectPage(projectName.value);
+        projectName.value = "";
         e.preventDefault();
     });
 
@@ -54,14 +58,22 @@ const addEvents = function() {
         const deleteProjectButtons = document.querySelectorAll(".delete-project");
 
         Array.from(deleteProjectButtons).forEach(button => button.addEventListener("click", (e) => {
-            console.log("test");
-            TaskManager.deleteProject(e.target.previousElementSibling.value);
+            TaskManager.deleteProject(e.target.previousElementSibling.textContent);
+            initTodayPage();
             loadProjects(projectList);
             enableDelete();
+            makeProjectsClickable();
             e.preventDefault();
-        }))
+        }));
     };
-}
+
+    const makeProjectsClickable = function() {
+        const projects = document.querySelectorAll(".project-name");
+        Array.from(projects).forEach(element => element.addEventListener("click", (e) => {
+            initProjectPage(e.target.textContent);
+        }));
+    };
+};
 
 const init = function() {
     addEvents();
