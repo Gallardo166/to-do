@@ -1,4 +1,4 @@
-import { hideElements, revealElements, removeElements, loadTasks, loadProjects } from "./dom";
+import { hideElements, revealElements, removeElements, loadTasks, loadProjectsToSidebar } from "./dom";
 import TaskManager from "./tasks";
 import initProjectPage from "./project-page";
 import initTodayPage from "./today-page";
@@ -22,6 +22,7 @@ const addEvents = function() {
     const projectList = document.querySelector("#projects-list")
     const confirmAddProjectButton = document.querySelector("#confirm-add-project");
     const projectName = document.querySelector("#project-name");
+    const todayButton = document.querySelector("#today");
 
     closeSidebarButton.addEventListener("click", () => {
         closeSidebar();
@@ -46,7 +47,7 @@ const addEvents = function() {
     confirmAddProjectButton.addEventListener("click", (e) => {
         removeElements(addProjectModal);
         TaskManager.createProject(projectName.value);
-        loadProjects(projectList);
+        loadProjectsToSidebar(projectList);
         enableDelete();
         makeProjectsClickable();
         initProjectPage(projectName.value);
@@ -60,7 +61,7 @@ const addEvents = function() {
         Array.from(deleteProjectButtons).forEach(button => button.addEventListener("click", (e) => {
             TaskManager.deleteProject(e.target.previousElementSibling.textContent);
             initTodayPage();
-            loadProjects(projectList);
+            loadProjectsToSidebar(projectList);
             enableDelete();
             makeProjectsClickable();
             e.preventDefault();
@@ -68,11 +69,16 @@ const addEvents = function() {
     };
 
     const makeProjectsClickable = function() {
-        const projects = document.querySelectorAll(".project-name");
+        const projects = document.querySelectorAll(".sidebar-project-name");
         Array.from(projects).forEach(element => element.addEventListener("click", (e) => {
             initProjectPage(e.target.textContent);
         }));
     };
+
+    todayButton.addEventListener("click", (e) => {
+        initTodayPage();
+        e.preventDefault();
+    });
 };
 
 const init = function() {

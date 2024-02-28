@@ -1,6 +1,6 @@
 import PlusIcon from "./images/plus.svg";
 import TaskManager from "./tasks";
-import { hideElements, revealElements, removeElements, loadTasksByDate } from "./dom";
+import { hideElements, revealElements, removeElements, loadTasksByDate, openTask } from "./dom";
 import pubsub from "./pubsub";
 
 const init = function() {
@@ -48,6 +48,34 @@ const init = function() {
     const noTask = document.querySelector("#no-task");
 
     const addEvents = function() {
+        const enableDelete = function() {
+            Array.from(document.querySelectorAll(".delete-task")).forEach(button => button.addEventListener("click", (e) => {
+                let taskid = Array.from(e.target.classList)[0];
+                TaskManager.deleteTask(TaskManager.getTaskById(taskid));
+                loadTasksByDate(todayTaskContainer, "today");
+                makeTasksClickable();
+                enableDelete();
+                if (TaskManager.filterTaskByDate("today").length === 0) {
+                    revealElements(noTask);
+                };
+                e.preventDefault();
+            }))
+        };
+
+        const makeTasksClickable = function() {
+            Array.from(document.querySelectorAll(".task")).forEach(task => task.addEventListener("click", (e) => {
+                openTask(TaskManager.getTaskById(Array.from(e.target.classList)[0]));
+                e.preventDefault();
+            }))
+        };
+
+        if (TaskManager.filterTaskByDate("today").length > 0) {
+            removeElements(noTask);
+            loadTasksByDate(todayTaskContainer, "today");
+            makeTasksClickable();
+            enableDelete();
+        };
+
         addTaskButton.addEventListener("click", () => {
             removeElements(addTaskContainer);
             removeElements(noTask);
@@ -60,6 +88,7 @@ const init = function() {
             TaskManager.addTask(task, "projectless", "sectionless");
 
             loadTasksByDate(todayTaskContainer, "today");
+            makeTasksClickable();
             enableDelete();
             revealElements(addTaskContainer);
             removeElements(infoModal);
@@ -78,19 +107,6 @@ const init = function() {
             };
             e.preventDefault();
         });
-
-        const enableDelete = function() {
-            Array.from(document.querySelectorAll(".delete-today")).forEach(button => button.addEventListener("click", (e) => {
-                let taskid = e.target.id.split("-")[1];
-                TaskManager.deleteTask(TaskManager.getTaskById(taskid));
-
-                loadTasksByDate(todayTaskContainer, "today");
-                enableDelete();
-                if (TaskManager.filterTaskByDate("today").length === 0) {
-                    revealElements(noTask);
-                };
-            }))
-        };
     };
 
     addEvents();

@@ -79,12 +79,17 @@ const TaskManager = {
 
     deleteTask: function(task) {
         this.allTasks[0].splice(task.id, 1);
-        let { projectName , sectionName } = this.getTaskProjectAndSection(task);''
-        this.getSection(projectName, sectionName).tasks.splice(task.id, 1);
+        let { projectName , sectionName } = this.getTaskProjectAndSection(task);
+        this.getSection(projectName, sectionName).tasks.splice(this.getSection(projectName, sectionName).tasks.indexOf(task), 1);
         this.resetTaskId();
     },
 
     deleteProject: function(projectName) {
+        for (let i=0; i<this.getProject(projectName).sections.length; i++) {
+            for (let j=0; j<this.getProject(projectName).sections[i].tasks.length; j++) {
+                this.deleteTask(this.getProject(projectName).sections[i].tasks[j]);
+            };
+        };
         this.allTasks.splice(this.allTasks.indexOf(this.getProject(projectName)), 1);
     },
 

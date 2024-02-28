@@ -1,4 +1,4 @@
-import { hideElements, revealElements, removeElements, loadTasksByDate, loadProjects, loadSections } from "./dom";
+import { hideElements, revealElements, removeElements, loadTasksByDate, loadProjects, loadSections, openTask } from "./dom";
 import PlusIcon from "./images/plus.svg";
 import TaskManager from "./tasks";
 
@@ -38,6 +38,77 @@ const init = function(projectName) {
     const taskInfoModals = document.querySelectorAll(".task-info-modal");
 
     const addEvents = function() {
+        const enableAddTask = function() {
+            Array.from(document.querySelectorAll(".add-task-button")).forEach((button) => button.addEventListener("click", (e) => {
+                let sectionName = Array.from(e.target.classList)[0];
+                console.log(sectionName);
+                Array.from(taskInfoModals).forEach(element => removeElements(element));
+                const currentModal = document.querySelector(`.${sectionName}.task-info-modal`);
+                revealElements(currentModal);
+            }));
+        };
+
+        const enableCancelAddTask = function() {
+            Array.from(document.querySelectorAll(".cancel-add-task")).forEach((button) => button.addEventListener("click", (e) => {
+                let sectionName = Array.from(e.target.classList)[0];
+                const currentModal = document.querySelector(`.${sectionName}.task-info-modal`);
+                removeElements(currentModal);
+                resetTaskModal(sectionName);
+                e.preventDefault();
+            }));
+        };
+
+        const enableConfirmAddTask = function() {
+            Array.from(document.querySelectorAll(".confirm-add-task")).forEach((button) => button.addEventListener("click", (e) => {
+                let sectionName = Array.from(e.target.classList)[0];
+                const currentModal = document.querySelector(`.${sectionName}.task-info-modal`);
+                const taskName = document.querySelector(`.${sectionName}.task-name`);
+                const description = document.querySelector(`.${sectionName}.description`);
+                const priority = document.querySelector(`.${sectionName}.priority`);
+                const dueDate = document.querySelector(`.${sectionName}.due-date`);
+                const newTask = TaskManager.createTask(taskName.value, description.value, dueDate.value, priority.value, "not done");
+                TaskManager.addTask(newTask, projectName, sectionName.replace(/-/g, " "));
+                console.log(TaskManager.allTasks);
+                loadSections(projectSections, projectName);
+                makeTasksClickable();
+                enableAddTask();
+                enableCancelAddTask();
+                enableConfirmAddTask();
+                enableDeleteTask();
+                removeElements(currentModal);
+                resetTaskModal(sectionName);
+                e.preventDefault();
+            }));
+        };
+
+        const enableDeleteTask = function() {
+            Array.from(document.querySelectorAll(".delete-task")).forEach((button) => button.addEventListener("click", (e) => {
+                let taskid = Array.from(e.target.classList)[0];
+                TaskManager.deleteTask(TaskManager.getTaskById(taskid));
+                loadSections(projectSections, projectName);
+                makeTasksClickable();
+                enableAddTask();
+                enableCancelAddTask();
+                enableConfirmAddTask();
+                enableDeleteTask();
+                e.preventDefault();
+            }));
+        };
+
+        const makeTasksClickable = function() {
+            Array.from(document.querySelectorAll(".task")).forEach(task => task.addEventListener("click", (e) => {
+                openTask(TaskManager.getTaskById(Array.from(e.target.classList)[0]));
+                e.preventDefault();
+            }))
+        };
+
+        loadSections(projectSections, projectName);
+        makeTasksClickable();
+        enableAddTask();
+        enableCancelAddTask();
+        enableConfirmAddTask();
+        enableDeleteTask();
+
         addSectionButton.addEventListener("click", () => {
             removeElements(addSectionContainer);
             revealElements(sectionInfoModal);
@@ -52,59 +123,17 @@ const init = function(projectName) {
 
         confirmAddSectionButton.addEventListener("click", (e) => {
             TaskManager.createSection(projectName, sectionName.value);
-            console.log(TaskManager.allTasks);
             loadSections(projectSections, projectName);
+            makeTasksClickable();
             enableAddTask();
             enableCancelAddTask();
             enableConfirmAddTask();
+            enableDeleteTask();
             removeElements(sectionInfoModal);
             revealElements(addSectionContainer);
             resetSectionModal();
             e.preventDefault();
         });
-
-        const enableAddTask = function() {
-            const addTaskButtons = document.querySelectorAll(".add-task-button");
-            Array.from(addTaskButtons).forEach((button) => button.addEventListener("click", (e) => {
-                let sectionName = Array.from(e.target.classList)[0];
-                console.log(sectionName);
-                Array.from(taskInfoModals).forEach(element => removeElements(element));
-                const currentModal = document.querySelector(`.${sectionName}.task-info-modal`);
-                revealElements(currentModal);
-            }));
-        };
-
-        const enableCancelAddTask = function() {
-            const cancelAddTaskButtons = document.querySelectorAll(".cancel-add-task");
-            Array.from(cancelAddTaskButtons).forEach((button) => button.addEventListener("click", (e) => {
-                let sectionName = Array.from(e.target.classList)[0];
-                const currentModal = document.querySelector(`.${sectionName}.task-info-modal`);
-                removeElements(currentModal);
-                resetTaskModal(sectionName);
-                e.preventDefault();
-            }));
-        };
-
-        const enableConfirmAddTask = function() {
-            const confirmAddTaskButtons = document.querySelectorAll(".confirm-add-task");
-            Array.from(confirmAddTaskButtons).forEach((button) => button.addEventListener("click", (e) => {
-                let sectionName = Array.from(e.target.classList)[0];
-                const currentModal = document.querySelector(`.${sectionName}.task-info-modal`);
-                const taskName = document.querySelector(`.${sectionName}.task-name`);
-                const description = document.querySelector(`.${sectionName}.description`);
-                const priority = document.querySelector(`.${sectionName}.priority`);
-                const dueDate = document.querySelector(`.${sectionName}.due-date`);
-                const newTask = TaskManager.createTask(taskName.value, description.value, dueDate.value, priority.value, "not done");
-                TaskManager.addTask(newTask, projectName, sectionName);
-                loadSections(projectSections, projectName);
-                enableAddTask();
-                enableCancelAddTask();
-                enableConfirmAddTask();
-                removeElements(currentModal);
-                resetTaskModal(sectionName);
-                e.preventDefault();
-            }));
-        };
     };
 
     addEvents();
