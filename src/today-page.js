@@ -46,11 +46,12 @@ const init = function() {
     const infoModal = document.querySelector("#info-modal");
     const todayTaskContainer = document.querySelector("#today-task-container");
     const noTask = document.querySelector("#no-task");
+    const taskDialog = document.querySelector("#task-dialog");
 
     const addEvents = function() {
         const enableDelete = function() {
             Array.from(document.querySelectorAll(".delete-task")).forEach(button => button.addEventListener("click", (e) => {
-                let taskid = Array.from(e.target.classList)[0];
+                const taskid = e.target.getAttribute("data-task-id");
                 TaskManager.deleteTask(TaskManager.getTaskById(taskid));
                 loadTasksByDate(todayTaskContainer, "today");
                 makeTasksClickable();
@@ -59,14 +60,35 @@ const init = function() {
                     revealElements(noTask);
                 };
                 e.preventDefault();
-            }))
+            }));
         };
 
         const makeTasksClickable = function() {
             Array.from(document.querySelectorAll(".task")).forEach(task => task.addEventListener("click", (e) => {
-                openTask(TaskManager.getTaskById(Array.from(e.target.classList)[0]));
+                openTask(TaskManager.getTaskById(e.target.getAttribute("data-task-id")));
+                enableConfirmEditTask(TaskManager.getTaskById(e.target.getAttribute("data-task-id")));
                 e.preventDefault();
-            }))
+            }));
+        };
+
+        const enableConfirmEditTask = function(task) {
+            const confirmEditTaskButton = document.querySelector("#confirm-edit-task");
+            const selection = document.querySelector("#dropdown-projects");
+
+            confirmEditTaskButton.addEventListener("click", (e) => {
+                const selectedOption = Array.from(selection.children)[selection.selectedIndex];
+                const newProject = selectedOption.getAttribute("data-project-name");
+                const newSection = selectedOption.getAttribute("data-section-name");
+                TaskManager.moveTask(task, newProject, newSection);
+                loadTasksByDate(todayTaskContainer, "today");
+                makeTasksClickable();
+                enableDelete();
+                if (TaskManager.filterTaskByDate("today").length === 0) {
+                    revealElements(noTask);
+                };
+                taskDialog.close();
+                e.preventDefault();
+            });
         };
 
         if (TaskManager.filterTaskByDate("today").length > 0) {

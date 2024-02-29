@@ -36,23 +36,23 @@ const init = function(projectName) {
     const sectionName = document.querySelector("#section-name");
     const projectSections = document.querySelector("#project-sections");
     const taskInfoModals = document.querySelectorAll(".task-info-modal");
+    const taskDialog = document.querySelector("#task-dialog");
 
     const addEvents = function() {
         const enableAddTask = function() {
             Array.from(document.querySelectorAll(".add-task-button")).forEach((button) => button.addEventListener("click", (e) => {
-                let sectionName = Array.from(e.target.classList)[0];
-                console.log(sectionName);
+                let sectionName = e.target.getAttribute("data-section-name");
                 Array.from(taskInfoModals).forEach(element => removeElements(element));
-                const currentModal = document.querySelector(`.${sectionName}.task-info-modal`);
-                revealElements(currentModal);
+                const taskInfoModal = document.querySelector(`[data-section-name="${sectionName}"][class~="task-info-modal"]`);
+                revealElements(taskInfoModal);
             }));
         };
 
         const enableCancelAddTask = function() {
             Array.from(document.querySelectorAll(".cancel-add-task")).forEach((button) => button.addEventListener("click", (e) => {
-                let sectionName = Array.from(e.target.classList)[0];
-                const currentModal = document.querySelector(`.${sectionName}.task-info-modal`);
-                removeElements(currentModal);
+                let sectionName = e.target.getAttribute("data-section-name");
+                const taskInfoModal = document.querySelector(`[data-section-name="${sectionName}"][class~="task-info-modal"]`);
+                removeElements(taskInfoModal);
                 resetTaskModal(sectionName);
                 e.preventDefault();
             }));
@@ -60,21 +60,16 @@ const init = function(projectName) {
 
         const enableConfirmAddTask = function() {
             Array.from(document.querySelectorAll(".confirm-add-task")).forEach((button) => button.addEventListener("click", (e) => {
-                let sectionName = Array.from(e.target.classList)[0];
-                const currentModal = document.querySelector(`.${sectionName}.task-info-modal`);
-                const taskName = document.querySelector(`.${sectionName}.task-name`);
-                const description = document.querySelector(`.${sectionName}.description`);
-                const priority = document.querySelector(`.${sectionName}.priority`);
-                const dueDate = document.querySelector(`.${sectionName}.due-date`);
+                let sectionName = e.target.getAttribute("data-section-name");
+                const currentModal = document.querySelector(`[data-section-name="${sectionName}"][class~="task-info-modal"]`);
+                const taskName = document.querySelector(`[data-section-name="${sectionName}"][class~="task-name"]`);
+                const description = document.querySelector(`[data-section-name="${sectionName}"][class~="description"]`);
+                const priority = document.querySelector(`[data-section-name="${sectionName}"][class~="priority"]`);
+                const dueDate = document.querySelector(`[data-section-name="${sectionName}"][class~="due-date"]`);
                 const newTask = TaskManager.createTask(taskName.value, description.value, dueDate.value, priority.value, "not done");
-                TaskManager.addTask(newTask, projectName, sectionName.replace(/-/g, " "));
-                console.log(TaskManager.allTasks);
-                loadSections(projectSections, projectName);
-                makeTasksClickable();
-                enableAddTask();
-                enableCancelAddTask();
-                enableConfirmAddTask();
-                enableDeleteTask();
+
+                TaskManager.addTask(newTask, projectName, sectionName);
+                reloadFlow();
                 removeElements(currentModal);
                 resetTaskModal(sectionName);
                 e.preventDefault();
@@ -83,31 +78,45 @@ const init = function(projectName) {
 
         const enableDeleteTask = function() {
             Array.from(document.querySelectorAll(".delete-task")).forEach((button) => button.addEventListener("click", (e) => {
-                let taskid = Array.from(e.target.classList)[0];
-                TaskManager.deleteTask(TaskManager.getTaskById(taskid));
-                loadSections(projectSections, projectName);
-                makeTasksClickable();
-                enableAddTask();
-                enableCancelAddTask();
-                enableConfirmAddTask();
-                enableDeleteTask();
+                TaskManager.deleteTask(TaskManager.getTaskById(e.target.getAttribute("data-task-id")));
+                reloadFlow();
                 e.preventDefault();
             }));
         };
 
         const makeTasksClickable = function() {
             Array.from(document.querySelectorAll(".task")).forEach(task => task.addEventListener("click", (e) => {
-                openTask(TaskManager.getTaskById(Array.from(e.target.classList)[0]));
+                openTask(TaskManager.getTaskById(e.target.getAttribute("data-task-id")));
+                enableConfirmEditTask(TaskManager.getTaskById(e.target.getAttribute("data-task-id")));
                 e.preventDefault();
             }))
         };
 
-        loadSections(projectSections, projectName);
-        makeTasksClickable();
-        enableAddTask();
-        enableCancelAddTask();
-        enableConfirmAddTask();
-        enableDeleteTask();
+        const enableConfirmEditTask = function(task) {
+            const confirmEditTaskButton = document.querySelector("#confirm-edit-task");
+            const selection = document.querySelector("#dropdown-projects");
+
+            confirmEditTaskButton.addEventListener("click", (e) => {
+                const selectedOption = Array.from(selection.children)[selection.selectedIndex];
+                const newProject = selectedOption.getAttribute("data-project-name");
+                const newSection = selectedOption.getAttribute("data-section-name");
+                TaskManager.moveTask(task, newProject, newSection);
+                reloadFlow();
+                taskDialog.close();
+                e.preventDefault();
+            });
+        };
+
+        const reloadFlow = function() {
+            loadSections(projectSections, projectName);
+            makeTasksClickable();
+            enableAddTask();
+            enableCancelAddTask();
+            enableConfirmAddTask();
+            enableDeleteTask();
+        }
+
+        reloadFlow();
 
         addSectionButton.addEventListener("click", () => {
             removeElements(addSectionContainer);
@@ -123,12 +132,7 @@ const init = function(projectName) {
 
         confirmAddSectionButton.addEventListener("click", (e) => {
             TaskManager.createSection(projectName, sectionName.value);
-            loadSections(projectSections, projectName);
-            makeTasksClickable();
-            enableAddTask();
-            enableCancelAddTask();
-            enableConfirmAddTask();
-            enableDeleteTask();
+            reloadFlow();
             removeElements(sectionInfoModal);
             revealElements(addSectionContainer);
             resetSectionModal();
@@ -143,10 +147,10 @@ const init = function(projectName) {
     };
 
     const resetTaskModal = function(sectionName) {
-            const taskName = document.querySelector(`.${sectionName}.task-name`);
-            const description = document.querySelector(`.${sectionName}.description`);
-            const priority = document.querySelector(`.${sectionName}.priority`);
-            const dueDate = document.querySelector(`.${sectionName}.due-date`);
+            const taskName = document.querySelector(`[data-section-name="${sectionName}"][class~="task-name"]`);
+            const description = document.querySelector(`[data-section-name="${sectionName}"][class~="description"]`);
+            const priority = document.querySelector(`[data-section-name="${sectionName}"][class~="priority"]`);
+            const dueDate = document.querySelector(`[data-section-name="${sectionName}"][class~="due-date"]`);
 
             taskName.value = "";
             description.value = "";

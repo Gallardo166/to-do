@@ -59,7 +59,7 @@ const addEvents = function() {
         const deleteProjectButtons = document.querySelectorAll(".delete-project");
 
         Array.from(deleteProjectButtons).forEach(button => button.addEventListener("click", (e) => {
-            TaskManager.deleteProject(e.target.previousElementSibling.textContent);
+            TaskManager.deleteProject(e.target.getAttribute("data-project-name"));
             initTodayPage();
             loadProjectsToSidebar(projectList);
             enableDelete();
@@ -71,7 +71,7 @@ const addEvents = function() {
     const makeProjectsClickable = function() {
         const projects = document.querySelectorAll(".sidebar-project-name");
         Array.from(projects).forEach(element => element.addEventListener("click", (e) => {
-            initProjectPage(e.target.textContent);
+            initProjectPage(e.target.getAttribute("data-project-name"));
         }));
     };
 
