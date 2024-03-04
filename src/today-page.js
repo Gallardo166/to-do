@@ -2,12 +2,18 @@ import PlusIcon from "./images/plus.svg";
 import TaskManager from "./tasks";
 import { hideElements, revealElements, removeElements, loadTasksByDate, openTask } from "./dom";
 import pubsub from "./pubsub";
+import { format, formatDistance, subDays, isToday } from "date-fns";
 
 const init = function() {
+    const today = format(new Date(), "yyyy-MM-dd");
+
     const renderTodayPageEmpty = function() {
-        const projectContent = document.querySelector("#project-content");
-        projectContent.innerHTML = "";
         const todayContent = document.querySelector("#today-content");
+        const upcomingContent = document.querySelector("#upcoming-content");
+        const projectContent = document.querySelector("#project-content");
+
+        upcomingContent.innerHTML = "";
+        projectContent.innerHTML = "";
         todayContent.innerHTML = `
             <h1>Today</h1>
             <div id="today-task-container"></div>
@@ -53,10 +59,10 @@ const init = function() {
             Array.from(document.querySelectorAll(".delete-task")).forEach(button => button.addEventListener("click", (e) => {
                 const taskid = e.target.getAttribute("data-task-id");
                 TaskManager.deleteTask(TaskManager.getTaskById(taskid));
-                loadTasksByDate(todayTaskContainer, "today");
+                loadTasksByDate(todayTaskContainer, isToday);
                 makeTasksClickable();
                 enableDelete();
-                if (TaskManager.filterTaskByDate("today").length === 0) {
+                if (TaskManager.filterTaskByDate(today).length === 0) {
                     revealElements(noTask);
                 };
                 e.preventDefault();
@@ -76,14 +82,20 @@ const init = function() {
             const selection = document.querySelector("#dropdown-projects");
 
             confirmEditTaskButton.addEventListener("click", (e) => {
+                const newTitle = document.querySelector("#edit-task-title").value;
+                const newDescription = document.querySelector("#edit-task-description").value;
+                const newDueDate = document.querySelector("#edit-task-due-date").value;
+                const newPriority = document.querySelector("#edit-task-priority").value;
                 const selectedOption = Array.from(selection.children)[selection.selectedIndex];
                 const newProject = selectedOption.getAttribute("data-project-name");
                 const newSection = selectedOption.getAttribute("data-section-name");
+
+                TaskManager.editTask(task, newTitle, newDescription, newDueDate, newPriority);
                 TaskManager.moveTask(task, newProject, newSection);
-                loadTasksByDate(todayTaskContainer, "today");
+                loadTasksByDate(todayTaskContainer, isToday);
                 makeTasksClickable();
                 enableDelete();
-                if (TaskManager.filterTaskByDate("today").length === 0) {
+                if (TaskManager.filterTaskByDate(isToday).length === 0) {
                     revealElements(noTask);
                 };
                 taskDialog.close();
@@ -91,9 +103,9 @@ const init = function() {
             });
         };
 
-        if (TaskManager.filterTaskByDate("today").length > 0) {
+        if (TaskManager.filterTaskByDate(isToday).length > 0) {
             removeElements(noTask);
-            loadTasksByDate(todayTaskContainer, "today");
+            loadTasksByDate(todayTaskContainer, isToday);
             makeTasksClickable();
             enableDelete();
         };
@@ -109,22 +121,20 @@ const init = function() {
             let task = TaskManager.createTask(taskInfo.title, taskInfo.description, taskInfo.dueDate, taskInfo.priority, taskInfo.status);
             TaskManager.addTask(task, "projectless", "sectionless");
 
-            loadTasksByDate(todayTaskContainer, "today");
+            loadTasksByDate(todayTaskContainer, isToday);
             makeTasksClickable();
             enableDelete();
             revealElements(addTaskContainer);
             removeElements(infoModal);
             resetModal();
             e.preventDefault();
-
-            console.log(TaskManager.allTasks)
         });
 
         cancelButton.addEventListener("click", (e) => {
             revealElements(addTaskContainer);
             resetModal();
             removeElements(infoModal);
-            if (TaskManager.filterTaskByDate("today").length === 0) {
+            if (TaskManager.filterTaskByDate(isToday).length === 0) {
                 revealElements(noTask);
             };
             e.preventDefault();
@@ -138,7 +148,7 @@ const init = function() {
     let priority = document.querySelector("#priority");
 
     const getTaskInfo = function() {
-        return { title: taskName.value, description: description.value, dueDate: "today", priority: priority.value, status: "not done" };
+        return { title: taskName.value, description: description.value, dueDate: today, priority: priority.value, status: "not done" };
     };
 
     const resetModal = function() {

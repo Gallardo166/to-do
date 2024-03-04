@@ -2,6 +2,7 @@ import { hideElements, revealElements, removeElements, loadTasks, loadProjectsTo
 import TaskManager from "./tasks";
 import initProjectPage from "./project-page";
 import initTodayPage from "./today-page";
+import initUpcomingPage from "./upcoming-page";
 
 const closeSidebar = function() {
     const sidebar = document.querySelector("#sidebar");
@@ -23,6 +24,8 @@ const addEvents = function() {
     const confirmAddProjectButton = document.querySelector("#confirm-add-project");
     const projectName = document.querySelector("#project-name");
     const todayButton = document.querySelector("#today");
+    const upcomingButton = document.querySelector("#upcoming");
+    const dashboardButton = document.querySelector("#dashboard");
 
     closeSidebarButton.addEventListener("click", () => {
         closeSidebar();
@@ -32,6 +35,16 @@ const addEvents = function() {
     openSidebarButton.addEventListener("click", () => {
         openSidebar();
         hideElements(openSidebarButton);
+    });
+
+    todayButton.addEventListener("click", (e) => {
+        initTodayPage();
+        e.preventDefault();
+    });
+
+    upcomingButton.addEventListener("click", (e) => {
+        initUpcomingPage();
+        e.preventDefault();
     });
 
     addProjectButton.addEventListener("click", () => {
@@ -75,10 +88,9 @@ const addEvents = function() {
         }));
     };
 
-    todayButton.addEventListener("click", (e) => {
-        initTodayPage();
-        e.preventDefault();
-    });
+    loadProjectsToSidebar(projectList);
+    enableDelete();
+    makeProjectsClickable();
 };
 
 const init = function() {
