@@ -6,37 +6,65 @@
         <title>To-Do</title>
     <script defer src="runtime.js"></script><script defer src="main.js"></script></head>
     <body>
+        <div id="event-checker"></div>
+        <dialog id="task-dialog">
+            <div data-open="task-dialog" id="task-dialog-container"></div>
+        </dialog>
+        <dialog id="delete-project-dialog">
+            <div id="delete-project-dialog-container">
+                <p>This will delete all tasks in the project. Proceed?</p>
+                <img src="002c37dbe5008b976530.png" alt="Cat">
+                <button id="cancel-delete-project">Cancel</button>
+                <button id="confirm-delete-project">Delete</button>
+            </div>
+        </dialog>
+        <dialog id="delete-section-dialog">
+            <div id="delete-section-dialog-container">
+                <p>This will delete all tasks in the section. Proceed?</p>
+                <img src="002c37dbe5008b976530.png" alt="Cat">
+                <button id="cancel-delete-section">Cancel</button>
+                <button id="confirm-delete-section">Delete</button>
+            </div>
+        </dialog>
+        <dialog id="delete-task-dialog">
+            <div id="delete-task-dialog-container">
+                <p>Do you want to delete this task?</p>
+                <img src="002c37dbe5008b976530.png" alt="Cat">
+                <button id="cancel-delete-task">Cancel</button>
+                <button id="confirm-delete-task">Delete</button>
+            </div>
+        </dialog>
         <div id="sidebar">
-            <button id="sidebar-toggle-close">
-                <img src="afd6ac8d6af0706b7492.svg" alt="Close Sidebar">
-            </button>
-            <hr>
-            <button id="today" class="menu">
-                <img src="f5938f7bd5b7ad814151.svg" alt="Today Calendar">
-                <p>Today</p>
-            </button>
-            <button id="upcoming" class="menu">
-                <img src="18f552623324e58156e6.svg" alt="Month Calender">
-                <p>Upcoming</p>
-            </button>
-            <button id="dashboard" class="menu">
-                <img src="564e6b52b278f697ca77.svg" alt="Dashboard">
-                <p>Dashboard</p>
-            </button>
-            <div id="projects-header" class="menu">
-                <p>My Projects</p>
-                <button id="add-project">
-                    <p id="add-project-img">+</p>
+            <div id="sidebar-container">
+                <button id="sidebar-toggle-close">
+                    <img src="afd6ac8d6af0706b7492.svg" alt="Close Sidebar">
                 </button>
-            </div>
-            <div id="projects-list">
-            </div>
-            <div id="add-project-modal" class="removed">
-                <form>
-                    <input id="project-name" type="text" placeholder="Project Name" />
-                    <button id="confirm-add-project">Add</button>
-                    <button id="cancel-add-project">Cancel</button>
-                </form>
+                <button id="today" class="menu">
+                    <div id="today-icon">
+                        <p id="date"></p>
+                        <img src="f5938f7bd5b7ad814151.svg" alt="Today Calendar">
+                    </div>
+                    <p>Today</p>
+                </button>
+                <button id="upcoming" class="menu">
+                    <img src="18f552623324e58156e6.svg" alt="Month Calender">
+                    <p>Upcoming</p>
+                </button>
+                <div id="projects-header" class="menu">
+                    <p>My Projects</p>
+                    <button data-open="add project modal" id="add-project">
+                        <img src="8f038690ec4a679df399.svg" alt="Plus" data-open="add project modal" id="add-project-img">
+                    </button>
+                </div>
+                <div id="projects-list">
+                </div>
+                <div id="add-project-modal" class="removed">
+                    <form>
+                        <input data-open="add project modal" id="project-name" type="text" placeholder="Project Name" autocomplete="off" />
+                        <button data-open="add project modal" id="confirm-add-project" disabled>Add<div id="sidebar-message"></div></button>
+                        <button data-open="add project modal" id="cancel-add-project">Cancel</button>
+                    </form>
+                </div>
             </div>
 
         </div>
@@ -45,6 +73,8 @@
                 <img src="7368ae2bf68dfc6d2fa3.svg">
             </button>
             <div id="today-content">
+            </div>
+            <div id="upcoming-content">
             </div>
             <div id="project-content">
             </div>
