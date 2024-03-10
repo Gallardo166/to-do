@@ -1,0 +1,513 @@
+@font-face {
+    font-family: satoshi-medium;
+    src: url(./fonts/Satoshi-Medium.otf);
+}
+
+body {
+    background-color: #212020;
+}
+
+#main-content {
+    height: 100vh;
+    background-color: #212020;
+    flex-grow: 1;
+    margin-top: 32px;
+    padding: 12px;
+    box-sizing: border-box;
+    overflow: scroll;
+    z-index: -2;
+}
+
+#today-content {
+    min-width: 360px;
+    margin-left: 42px;
+    display: flex;
+    flex-direction: column;
+}
+
+#today-title {
+    position: fixed
+}
+
+#add-task-container:not(.removed) {
+    margin-top: 16px;
+}
+
+#add-task-button, .add-task-button {
+    padding: 0 0 0 6px;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+}
+
+#add-task-button-img-container, .add-task-button-img-container {
+    width: 20px;
+    clip-path: circle();
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#add-task-button-img {
+    filter: invert(32%) sepia(10%) saturate(2902%) hue-rotate(242deg) brightness(93%) contrast(91%);
+}
+
+#add-task-label, .add-task-label {
+    color:#8e8b8b;
+    margin: 0;
+}
+
+#add-task-button:hover {
+    #add-task-button-img-container {
+        background-color: #774384;
+    }
+
+    #add-task-button-img {
+        filter: invert(92%) sepia(0%) saturate(0%) hue-rotate(185deg) brightness(99%) contrast(80%);
+    }
+
+    #add-task-label {
+        color: #774384;
+    }
+}
+
+#info-modal:not(.removed) {
+    min-width: 240px;
+    margin-top: 16px;
+    margin-right: 36px;
+    padding: 12px 24px 16px 16px;
+    border: 0.4px solid #837e7e;
+    border-radius: 5px;
+
+    #task-name, #description, #priority, #select-project {
+        width: 100%;
+        outline: 0px;
+        border: none;
+        background: none;
+        caret-color: #d4d4d4;
+        color: #d4d4d4;
+    }
+
+    #task-name {
+        padding: 8px 5px 0 5px;
+        font-size: 1rem;
+        font-family: satoshi-medium, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+
+    #description {
+        box-sizing: border-box;
+        height: 8vh;
+        resize: none;
+        padding: 0 16px 0 5px;
+        margin-bottom: 12px;
+        font-size: 0.9rem;
+    }
+
+    hr {
+        margin: 8px 0;
+        border: 0.1px solid #837e7e;
+    }
+
+    #task-extra-info {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    #priority-container {
+        display: flex;
+        gap: 8px;
+        color: #d4d4d4;
+        font-size: 0.9rem;
+        align-items: center;
+    }
+
+    #priority, #select-project {
+        padding: 3px;
+        border: 0.4px solid #837e7e;
+        border-radius: 3px;
+    }
+
+    #select-project {
+        width: 50%;
+    }
+
+    #task-info-modal-buttons button {
+        margin-top: 16px;
+        padding: 5px;
+        color: #d4d4d4;
+        background-color: #444343;
+        border-radius: 5px;
+    }
+
+    #task-info-modal-buttons button:hover {
+        background-color:#5b5a5a;
+        transition: background-color 140ms ease-in-out;
+    }
+
+    #task-info-modal-buttons button[disabled] {
+        color:#a6a6a6;
+        background-color: #353333;
+        cursor: not-allowed;
+    }
+
+    #task-info-modal-buttons button[disabled]:hover #message {
+        display: block;
+        margin-left: 14px;
+        padding: 0 2px;
+    }
+
+    #message {
+        display: none;
+        position: absolute;
+        color:#d4d4d4;
+        background-color: #212020;
+        border: 1px solid #837e7e;
+    }
+}
+
+#no-task {
+    align-self: center;
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-left: -12px;
+    padding-right: 42px;
+}
+
+#no-task-image img {
+    margin-top: calc(6vh);
+    width: 280px;
+}
+
+#no-task-text {
+    margin-top: -20px;
+    display: grid;
+    grid-template: repeat(2, 32px) / 1fr;
+    justify-items: center;
+    align-items: center;
+}
+
+#today-task-container {
+    padding-right: 42px;
+    display: grid;
+    grid-auto-flow: row;
+    row-gap: 8px;
+    margin-top: 96px;
+}
+
+.task-container {
+    height: 54px;
+    padding-right: 8px;
+    background-color: #2a2929;
+    border: 1px solid #3d3c3c;
+    border-radius: 7px;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: border 150ms ease-in-out;
+}
+
+.task {
+    flex-grow: 1;
+    display: grid;
+    margin-left: 32px;
+    width: 100%;
+    grid-template: 25px 20px / 42px 1fr;
+    justify-items: start;
+    align-items: center;
+
+    img {
+        position: absolute;
+        width: 40px !important;
+        top: -6px;
+        left: -3px;
+    }
+
+    img[data-priority="1"] {
+        filter: invert(36%) sepia(45%) saturate(714%) hue-rotate(158deg) brightness(93%) contrast(91%);
+    }
+
+    img[data-priority="2"] {
+        filter: invert(30%) sepia(77%) saturate(446%) hue-rotate(100deg) brightness(89%) contrast(86%);
+    }
+
+    img[data-priority="3"] {
+        filter: invert(61%) sepia(13%) saturate(2074%) hue-rotate(21deg) brightness(88%) contrast(86%);
+    }
+
+    img[data-priority="4"] {
+        filter: invert(41%) sepia(68%) saturate(446%) hue-rotate(339deg) brightness(90%) contrast(91%);
+    }
+
+    img[data-priority="5"] {
+        filter: invert(12%) sepia(95%) saturate(2687%) hue-rotate(349deg) brightness(94%) contrast(85%);
+    }
+
+    .priority {
+        position: absolute;
+        font-size: 0.8rem;
+        top: -10px;
+        left: 14px;
+    }
+
+    .checkbox {
+        grid-area: 1 / 1 / span 2 / span 1;
+        width: 26px;
+        height: 26px;
+        border: 1px solid #837e7e;
+        border-radius: 50px;
+    }
+
+    .task-title {
+        grid-area: 1 / 2 / span 1 / span 1;
+        width: 100%;
+        text-align: start;
+        font-size: 1.1rem;
+    }
+
+    .task-project, .due-date {
+        grid-area: 2 / 2 / span 1 / span 1;
+        font-size: 0.85rem;
+        color:#a6a6a6;
+    }
+}
+
+.delete-task {
+    padding: 3px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.delete-task-icon {
+    width: 18px !important;
+    display: none;
+}
+
+.task-container:hover{
+    border-color: #837e7e;
+    transition: border 100ms ease-in-out;
+
+    .delete-task-icon {
+        display: initial;
+    }
+}
+
+.delete-task:hover {
+    background-color: #444343;
+    transition: background-color 140ms ease-in-out;
+}
+
+.checkbox[data-checked="done"] {
+    background-color: #399e4f;
+    transition: background-color 140ms ease-in-out;
+}
+
+.checkbox[data-checked="done"]::after {
+    content: "✓";
+    position: absolute;
+    top: 12px;
+    left: 46px;
+    font-size: 1.2rem;
+    color: #d4d4d4;
+}
+
+#task-dialog {
+    width: 68%;
+    height: 90%;
+    padding: 0;
+    background-color: #212020;
+    border: 1px solid #837e7e;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+#task-dialog-container {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+
+    #edit-task-title, #edit-task-description, #edit-task-due-date, #edit-task-priority, #dropdown-projects {
+        appearance: none;
+        outline: none;
+        background: none;
+        border: none;
+        color: #d4d4d4;
+    }
+
+    label, button {
+        color: #d4d4d4;
+    }
+
+    #edit-task-title {
+        margin-top: 18px;
+        width: 97%;
+        font-family: satoshi-medium, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        font-size: 1.5rem;
+        text-overflow: ellipsis;
+    }
+
+    #edit-task-description-container {
+        width: 97%;
+        display: flex;
+        align-items: start;
+        margin-top: 8px;
+    }
+
+    #edit-task-description-icon {
+        width: 16px;
+        filter: invert(52%) sepia(7%) saturate(164%) hue-rotate(314deg) brightness(94%) contrast(89%);
+    }
+
+    #edit-task-description-icon.removed {
+        width: 0 !important;
+        height: 0 !important;
+    }
+
+    #edit-task-description {
+        flex-grow: 1;
+        resize: none;
+        max-height: 40vh;
+        margin-top: -5px;
+        font-size: 1rem;
+    }
+
+    #edit-task-title, #edit-task-description-container, #edit-task-due-date, #edit-task-priority {
+        padding: 4px 3px;
+        border: 1px solid transparent;
+        border-radius: 5px;
+        transition: border 140ms ease-in-out;
+    }
+
+    #edit-task-title:hover, #edit-task-description-container:hover, #edit-task-due-date:hover, #edit-task-priority:hover {
+        border: 1px solid #8e8b8b;
+        transition: border 140ms ease-in-out;
+    }
+
+    #other-task-info {
+        width: 97%;
+        margin-top: 12px;
+        display: grid;
+        grid-template: repeat(4, 36px) /78px auto;
+        row-gap: 4px;
+        align-items: center;
+    }
+
+    #edit-task-due-date {
+        width: 100px;
+    }
+
+    #edit-task-due-date::-webkit-calendar-picker-indicator {
+        filter: invert(98%) sepia(0%) saturate(2388%) hue-rotate(183deg) brightness(109%) contrast(66%);
+    }
+
+    #edit-task-priority {
+        justify-self: center;
+        width: 100%;
+        background: transparent;
+    }
+
+    #edit-task-priority::-webkit-slider-runnable-track {
+        border: 1px solid #8e8b8b;
+        border-radius: 6px;
+        height: 0.8rem;
+    }
+
+    #edit-task-priority::-webkit-slider-thumb {
+        appearance: none;
+        background-color: #d4d4d4;
+        margin-top: -2.5px;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50px;
+    }
+
+    #scale {
+        grid-area: 3 / 2 / span 1 / span 1;
+        justify-self: center;
+        align-self: start;
+        width: 95%;
+        margin-top: -4px;
+        display: flex;
+        justify-content: space-between;
+        color: #d4d4d4;
+        font-family: satoshi-medium, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        font-size: 0.8rem;
+    }
+
+    #dropdown-projects {
+        grid-area: 4 / 1 / span 1 / span 2;
+        width: 120px;
+        text-overflow: ellipsis;
+        padding: 5px;
+        border: 1px solid #5b5a5a;
+        border-radius: 5px;
+        transition: border 140ms ease-in-out;
+        cursor: pointer;
+    }
+
+    #dropdown-projects:hover {
+        border: 1px solid #8e8b8b;
+    }
+
+    #close-task {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        width: 32px;
+        height: 32px;
+        border-radius: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: background-color 140ms ease-in-out;
+    }
+
+    #close-task:hover {
+        background-color:#5b5a5a;
+        transition: background-color 140ms ease-in-out;
+    }
+
+    #close-task-icon {
+        width: 24px;
+    }
+
+    #confirm-edit-task {
+        grid-area: 4 / 2 / span 1 / span 1;
+        justify-self: end;
+        padding: 5px 14px;
+        border-radius: 5px;
+        background-color: #7c3ca1;
+        font-family: satoshi-medium, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        transition: background-color 140ms ease-in-out;
+    }
+
+    #confirm-edit-task:hover {
+        background-color: #9d5dc2;
+        transition: background-color 140ms ease-in-out;
+    }
+
+    .empty {
+        flex-grow: 1;
+    }
+
+    > img {
+        width: 240px;
+        margin-left: -36px;
+        margin-bottom: -36px;
+    }
+}
+
+#task-dialog::backdrop {
+    background: rgb(0 0 0 / 55%)
+}

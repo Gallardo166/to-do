@@ -1,4 +1,4 @@
-import { compareDesc } from "date-fns";
+import { compareDesc, isBefore, format, sub } from "date-fns";
 
 const TaskManager = {
 
@@ -21,8 +21,16 @@ const TaskManager = {
         };
     },
 
+    makeObjectsEqual: function() {
+        this.allTasks[0].forEach(task => {
+            let { projectName, sectionName } = this.getTaskProjectAndSection(task);
+            this.getSection(projectName, sectionName).tasks.splice(this.getSectionTaskId(task, projectName, sectionName), 1, task);
+        });
+        this.saveTasks();
+    },
+
     saveTasks: function() {
-        localStorage.setItem("allTasks", JSON.stringify(TaskManager.allTasks));
+        localStorage.setItem("allTasks", JSON.stringify(this.allTasks));
     },
 
     createProject: function(projectName) {
@@ -87,6 +95,28 @@ const TaskManager = {
         };
     },
 
+    getSectionTaskId: function(task, projectName, sectionName) {
+        for (let i=0; i<this.getSection(projectName, sectionName).tasks.length; i++) {
+            if (this.getSection(projectName, sectionName).tasks[i].id === task.id) {
+                return i;
+            };
+        };
+    },
+
+    checkRepeatedProjectName: function(projectName) {
+        for (let i=1; i<this.allTasks.length; i++) {
+            if (projectName === this.allTasks[i].projectName) {return true};
+        };
+        return false;
+    },
+
+    checkRepeatedSectionName: function(projectName, sectionName) {
+        for (let i=0; i<this.getProject(projectName).sections.length; i++) {
+            if (sectionName === this.getProject(projectName).sections[i]) {return true};
+        };
+        return false;
+    },
+
     resetTaskId: function() {
         this.allTasks[0].forEach(task => task.id = this.allTasks[0].indexOf(task));
         this.saveTasks();
@@ -95,8 +125,16 @@ const TaskManager = {
     deleteTask: function(task) {
         this.allTasks[0].splice(task.id, 1);
         let { projectName , sectionName } = this.getTaskProjectAndSection(task);
-        this.getSection(projectName, sectionName).tasks.splice(this.getSection(projectName, sectionName).tasks.indexOf(task), 1);
+        this.getSection(projectName, sectionName).tasks.splice(this.getSectionTaskId(task, projectName, sectionName), 1);
         this.resetTaskId();
+        this.saveTasks();
+    },
+
+    deleteSection: function(projectName, sectionName) {
+        for (let i=0; i<this.getSection(projectName, sectionName).tasks.length; i++) {
+            this.deleteTask(this.getSection(projectName, sectionName).tasks[i]);
+        };
+        this.getProject(projectName).sections.splice(this.getProject(projectName).sections.indexOf(this.getSection(projectName, sectionName)), 1);
         this.saveTasks();
     },
 
@@ -131,18 +169,55 @@ const TaskManager = {
         return this.getSection(projectName, sectionName).tasks;
     },
 
-    moveTask: function(task, targetProjectName, targetSectionName) {
-        this.deleteTask(task);
-        this.addTask(task, targetProjectName, targetSectionName);
+    filterTaskByStatus: function(array) {
+        return {done: array.filter((task) => (task.status === "done")), notDone: array.filter((task) => (task.status === "not done"))};
+    },
+
+    filterOverdueTasks: function(array) {
+        const today = format(new Date(), "yyyy-MM-dd");
+        return this.filterTaskByStatus(array).notDone.filter(task => (isBefore(task.dueDate, today)));
+    },
+
+    filterNotOverdueTasks: function(array) {
+        const today = format(new Date(), "yyyy-MM-dd");
+        return array.filter(task => (!isBefore(task.dueDate, today) || (task.status === "done")));
+    },
+
+    editTask: function(task, newTitle, newDescription, newDueDate, newPriority, newStatus, newProject, newSection) {
+        let { projectName , sectionName } = this.getTaskProjectAndSection(task);
+        const newTask = this.createTask(newTitle, newDescription, newDueDate, newPriority, newStatus);
+        newTask.id = task.id;
+        this.allTasks[0].splice(this.allTasks[0].indexOf(task), 1, newTask);
+        this.getSection(projectName, sectionName).tasks.splice(this.getSectionTaskId(task, projectName, sectionName), 1, newTask);
+
+        if (!((this.getTaskProjectAndSection(newTask).projectName === newProject) && (this.getTaskProjectAndSection(newTask).sectionName === newSection))) {
+            this.deleteTask(newTask);
+            this.addTask(newTask, newProject, newSection);
+            this.saveTasks();
+        };
         this.saveTasks();
     },
 
-    editTask: function(task, newTitle, newDescription, newDueDate, newPriority) {
-        task.title = newTitle;
-        task.description = newDescription;
-        task.dueDate = newDueDate;
-        task.priority = newPriority;
+    changeProjectName: function(oldProjectName, newProjectName) {
+        const oldProject = this.getProject(oldProjectName);
+        oldProject.projectName = newProjectName;
         this.saveTasks();
+    },
+
+    changeSectionName: function(projectName, oldSectionName, newSectionName) {
+        const oldSection = this.getSection(projectName, oldSectionName);
+        oldSection.sectionName = newSectionName;
+        this.saveTasks();
+    },
+
+    completeTask: function(taskid) {
+        const task = TaskManager.getTaskById(taskid);
+        TaskManager.editTask(task, task.title, task.description, task.dueDate, task.priority, "done", TaskManager.getTaskProjectAndSection(task).projectName, TaskManager.getTaskProjectAndSection(task).sectionName);
+    },
+
+    uncompleteTask: function(taskid) {
+        const task = TaskManager.getTaskById(taskid);
+        TaskManager.editTask(task, task.title, task.description, task.dueDate, task.priority, "not done", TaskManager.getTaskProjectAndSection(task).projectName, TaskManager.getTaskProjectAndSection(task).sectionName);
     },
 };
 

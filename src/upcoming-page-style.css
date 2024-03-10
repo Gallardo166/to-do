@@ -1,0 +1,220 @@
+#upcoming-content {
+    min-width: 360px;
+    margin-left: 42px;
+    display: flex;
+    flex-direction: column;
+    overflow-x: scroll;
+    overflow-y: hidden;
+}
+
+#month-title {
+    position:fixed;
+    display: flex;
+    gap: 8px;
+
+    button {
+        color: #d4d4d4;
+        font-size: 1.2rem;
+        font-family: satoshi-medium, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+
+    h1 {
+        width: 320px;
+        text-align: center;
+    }
+}
+
+#upcoming-container {
+    display: flex;
+    width:fit-content;
+    height: 80vh;
+    margin-top: 84px;
+}
+
+#overdue {
+    margin-right: 24px;
+    width: 280px;
+
+    #overdue-tasks {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .task-container {
+            border-color: #a73d3d;
+        }
+
+        .task-container:hover {
+            border-color: #837e7e;
+        }
+    }
+}
+
+#overdue.removed {
+    width: 0;
+    height: 0;
+}
+
+#month-page {
+    padding-right: 64px;
+    display: flex;
+    gap: 24px;
+
+    #today, #tomorrow, #this-week, #this-month {
+        background: none;
+        width: 280px;
+    }
+
+    #today-tasks, #tomorrow-tasks, #this-week-tasks, #this-month-tasks {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        overflow: scroll;
+
+        .task-container:last-child {
+            margin-bottom: 8px;
+        }
+    }
+
+    .overdue {
+        border-color: #a73d3d;
+    }
+
+    .overdue:hover {
+        border-color: #837e7e;
+    }
+}
+
+.add-task-button-img[alt="Plus"] {
+    filter: invert(32%) sepia(10%) saturate(2902%) hue-rotate(242deg) brightness(93%) contrast(91%);
+}
+
+.add-task-button:hover {
+
+    .add-task-button-img-container {
+        background-color: #774384;
+    }
+
+    .add-task-button-img {
+        filter: invert(92%) sepia(0%) saturate(0%) hue-rotate(185deg) brightness(99%) contrast(80%);
+    }
+
+    .add-task-label {
+        color: #774384;
+    }
+}
+
+.upcoming-page-task-info-modal:not(.removed) {
+    box-sizing: border-box;
+    width: 280px;
+    margin-right: 36px;
+    padding: 12px 24px 16px 16px;
+    border: 0.4px solid #837e7e;
+    border-radius: 5px;
+
+    .task-name, .description, .priority, .select-project, .due-date {
+        width: 100%;
+        outline: 0px;
+        border: none;
+        background: none;
+        caret-color: #d4d4d4;
+        color: #d4d4d4;
+    }
+
+    .task-name {
+        padding: 8px 5px 0 5px;
+        font-size: 1rem;
+        font-family: satoshi-medium, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+
+    .description {
+        box-sizing: border-box;
+        height: 8vh;
+        resize: none;
+        padding: 0 16px 0 5px;
+        margin-bottom: 12px;
+        font-size: 0.9rem;
+    }
+
+    hr {
+        margin: 8px 0;
+        border: 0.1px solid #837e7e;
+    }
+
+    .extra-task-info {
+        width: 60%;
+        display: flex;
+        flex-direction: column;
+        gap:4px;
+    }
+
+    .priority-container {
+        display: flex;
+        gap: 8px;
+        color: #d4d4d4;
+        font-size: 0.9rem;
+        align-items: center;
+    }
+
+    .priority, .select-project, .due-date {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 3px;
+        border: 0.4px solid #837e7e;
+        border-radius: 3px;
+    }
+
+    .task-info-modal-buttons button {
+        margin-top: 16px;
+        padding: 5px;
+        color: #d4d4d4;
+        background-color: #444343;
+        border-radius: 5px;
+    }
+
+    .task-info-modal-buttons button:hover , #cancel-add-section:hover, #confirm-add-section:hover {
+        background-color:#5b5a5a;
+        transition: background-color 140ms ease-in-out;
+    }
+
+    .task-info-modal-buttons button[disabled] {
+        color:#a6a6a6;
+        background-color: #353333;
+        cursor: not-allowed;
+    }
+
+    .task-info-modal-buttons button[disabled]:hover .message {
+        display: block;
+        margin-left: 14px;
+        padding: 0 2px;
+    }
+
+    .message {
+        display: none;
+        position: absolute;
+        color:#d4d4d4;
+        background-color: #212020;
+        border: 1px solid #837e7e;
+    }
+}
+
+#image-container {
+    position: fixed;
+    top: 360px;
+    display: flex;
+    align-items: center;
+    width: 280px;
+    
+    img {
+        margin-left: 70px;
+        width: 280px;
+    }
+
+    p {
+        margin-left: -48px;
+    }
+
+    z-index: -1;
+}

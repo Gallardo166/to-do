@@ -1,18 +1,18 @@
 # to-do
 
-Tasks left:
+--Reflection--
 
-1. Manage sectionless tasks DONE
-2. Allow moving task DONE
-3. Allow editing task info DONE
-4. Implementing date functionality DONE
-    - Live date DONE
-    - Upcoming tasks DONE
-    - Overdue tasks DONE
-5. Implementing local storage DONE
-6. Layout and styling
-    - Sidebar and page layout
-    - Task layout
-    - Priority, overdue, status styling
-    - Design
-7. Troubleshooting
+Concepts learnt:
+1. OOP - Single Responsibility principle
+2. CSS Transitions
+3. Date functions
+4. Local storage usage
+
+Concepts reinforced:
+1. Modules, webpack
+2. DOM Manipulation
+3. CSS Grid&Flex, Styling
+
+Things to improve on:
+1. Prior planning of project components
+2. Code organisation - not fully clean

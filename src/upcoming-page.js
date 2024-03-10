@@ -1,12 +1,15 @@
-import {loadCurrentMonth, loadPastMonth, loadFutureMonth, revealElements, removeElements, openTask } from "./dom";
+import "./upcoming-page-style.css";
+import { changeSidebarHighlight, loadCurrentMonth, loadPastMonth, loadFutureMonth, revealElements, removeElements, openTask, loadProjectsToDropdown, requiredFieldAlert } from "./dom";
 import { isBefore, isAfter, isToday, isTomorrow, isThisMonth, getMonth, add, sub, format, endOfWeek } from "date-fns";
 import TaskManager from "./tasks";
 
 const init = function() {
     const today = format(new Date(), "yyyy-MM-dd");
+    const upcomingButton = document.querySelector("#upcoming");
     const taskDialog = document.querySelector("#task-dialog");
 
     loadCurrentMonth(today);
+    changeSidebarHighlight(upcomingButton);
 
     const addEvents = function() {
         const enableSwitchMonths = function() {
@@ -29,6 +32,20 @@ const init = function() {
                 enableCancelAddTask();
                 enableConfirmAddTask();
                 makeTasksClickable();
+                enableCompleteTask();
+                Array.from(document.querySelectorAll(".task-name")).forEach(element => element.addEventListener("input", (e) => {
+                    const dataDueDate = e.target.getAttribute("data-due-date");
+                    if (e.target.value !== "") {
+                        document.querySelector(`[data-due-date="${dataDueDate}"][class~="confirm-add-task"]`).removeAttribute("disabled");
+                    } else {
+                        document.querySelector(`[data-due-date="${dataDueDate}"][class~="confirm-add-task"]`).setAttribute("disabled", "");
+                    }
+                }));
+                Array.from(document.querySelectorAll(".confirm-add-task")).forEach(button => {
+                    const dataDueDate = button.getAttribute("data-due-date");
+                    requiredFieldAlert(button, `[data-due-date="${dataDueDate}"][class="message"]`, "Please fill in task name");
+                });
+                (Array.from(document.querySelectorAll(".task")).length == 0) ? revealElements(document.querySelector("#image-container")) : removeElements(document.querySelector("#image-container"));
             });
 
             nextMonthButton.addEventListener("click", () => {
@@ -47,6 +64,20 @@ const init = function() {
                 enableCancelAddTask();
                 enableConfirmAddTask();
                 makeTasksClickable();
+                enableCompleteTask();
+                Array.from(document.querySelectorAll(".task-name")).forEach(element => element.addEventListener("input", (e) => {
+                    const dataDueDate = e.target.getAttribute("data-due-date");
+                    if (e.target.value !== "") {
+                        document.querySelector(`[data-due-date="${dataDueDate}"][class~="confirm-add-task"]`).removeAttribute("disabled");
+                    } else {
+                        document.querySelector(`[data-due-date="${dataDueDate}"][class~="confirm-add-task"]`).setAttribute("disabled", "");
+                    }
+                }));
+                Array.from(document.querySelectorAll(".confirm-add-task")).forEach(button => {
+                    const dataDueDate = button.getAttribute("data-due-date");
+                    requiredFieldAlert(button, `[data-due-date="${dataDueDate}"][class="message"]`, "Please fill in task name");
+                });
+                (Array.from(document.querySelectorAll(".task")).length == 0) ? revealElements(document.querySelector("#image-container")) : removeElements(document.querySelector("#image-container"));
             });
         };
 
@@ -59,10 +90,31 @@ const init = function() {
             }));
         };
 
+        const enableClickOut = function() {
+            document.addEventListener("click", (e) => {
+                if (e.target.getAttribute("data-open") !== "add task modal") {
+                    Array.from(document.querySelectorAll(".upcoming-page-task-info-modal")).forEach((modal) => {
+                        removeElements(modal);
+                        resetModal(modal.getAttribute("data-due-date"));
+                        revealElements(document.querySelector(`[data-due-date="${modal.getAttribute("data-due-date")}"][class~="add-task-button"]`));
+                        if (document.querySelectorAll(".task").length === 0) {
+                            revealElements(document.querySelector("#image-container"));
+                        }
+                    })
+                    e.preventDefault();
+                };
+            });
+        };
+
         const enableAddTask = function() {
             Array.from(document.querySelectorAll(".add-task-button")).forEach(button => button.addEventListener("click", (e) => {
-                revealElements(document.querySelector(`[data-due-date="${e.target.getAttribute("data-due-date")}"][class~="task-info-modal"]`));
+                revealElements(document.querySelector(`[data-due-date="${e.target.getAttribute("data-due-date")}"][class~="upcoming-page-task-info-modal"]`));
                 removeElements(document.querySelector(`[data-due-date="${e.target.getAttribute("data-due-date")}"][class~="add-task-button"]`));
+                removeElements(document.querySelector("#image-container"));
+                loadProjectsToDropdown(document.querySelector(`[data-due-date="${e.target.getAttribute("data-due-date")}"][class~="select-project"]`));
+                document.querySelector(`[data-due-date="${e.target.getAttribute("data-due-date")}"][class~="task-name"]`).focus();
+                document.querySelector(`[data-due-date="${e.target.getAttribute("data-due-date")}"][class~="confirm-add-task"]`).setAttribute("disabled", "");
+                enableClickOut();
                 e.preventDefault();
             }))
         };
@@ -70,7 +122,10 @@ const init = function() {
         const enableCancelAddTask = function() {
             Array.from(document.querySelectorAll(".cancel-add-task")).forEach(button => button.addEventListener("click", (e) => {
                 revealElements(document.querySelector(`[data-due-date="${e.target.getAttribute("data-due-date")}"][class~="add-task-button"]`));
-                removeElements(document.querySelector(`[data-due-date="${e.target.getAttribute("data-due-date")}"][class~="task-info-modal"]`));
+                removeElements(document.querySelector(`[data-due-date="${e.target.getAttribute("data-due-date")}"][class~="upcoming-page-task-info-modal"]`));
+                if (document.querySelectorAll(".task").length === 0) {
+                    revealElements(document.querySelector("#image-container"));
+                }
                 resetModal(e.target.getAttribute("data-due-date"));
                 e.preventDefault();
             }))
@@ -82,14 +137,18 @@ const init = function() {
                 const taskName = document.querySelector(`[data-due-date="${dataDueDate}"][class~="task-name"]`);
                 const description = document.querySelector(`[data-due-date="${dataDueDate}"][class~="description"]`);
                 const priority = document.querySelector(`[data-due-date="${dataDueDate}"][class~="priority"]`);
+                const project = document.querySelector(`[data-due-date="${dataDueDate}"][class~="select-project"]`);
+                const selectedOption = Array.from(project.children)[project.selectedIndex];
+                const taskProject = selectedOption.getAttribute("data-project-name");
+                const taskSection = selectedOption.getAttribute("data-section-name");
 
                 if (!((dataDueDate === "this-week") || (dataDueDate === "this-month"))) {
                     const task = TaskManager.createTask(taskName.value, description.value, dataDueDate, priority.value, "not done");
-                    TaskManager.addTask(task, "projectless", "sectionless");
+                    TaskManager.addTask(task, taskProject, taskSection);
                 } else {
                     const dueDate = document.querySelector(`[data-due-date="${dataDueDate}"][class~="due-date"]`);
                     const task = TaskManager.createTask(taskName.value, description.value, dueDate.value, priority.value, "not done");
-                    TaskManager.addTask(task, "projectless", "sectionless");
+                    TaskManager.addTask(task, taskProject, taskSection);
                 };
 
                 reloadFlow();
@@ -119,13 +178,25 @@ const init = function() {
                 const newProject = selectedOption.getAttribute("data-project-name");
                 const newSection = selectedOption.getAttribute("data-section-name");
 
-                TaskManager.editTask(task, newTitle, newDescription, newDueDate, newPriority);
-                TaskManager.moveTask(task, newProject, newSection);
+                TaskManager.editTask(task, newTitle, newDescription, newDueDate, newPriority, task.status, newProject, newSection);
                 reloadFlow();
                 taskDialog.close();
                 e.preventDefault();
             });
         };
+
+        const enableCompleteTask = function() {
+            Array.from(document.querySelectorAll(".checkbox")).forEach(button => button.addEventListener("click", (e) => {
+                if (!e.target.getAttribute("data-checked")) {
+                    TaskManager.completeTask(e.target.getAttribute("data-task-id"));
+                    e.target.setAttribute("data-checked", "done")
+                } else {
+                    TaskManager.uncompleteTask(e.target.getAttribute("data-task-id"));
+                    e.target.removeAttribute("data-checked");
+                };
+                reloadFlow();
+            }))
+        }
 
         const reloadFlow = function() {
             const pageMonth = document.querySelector("#month-page").getAttribute("data-month");
@@ -136,11 +207,25 @@ const init = function() {
             enableCancelAddTask();
             enableConfirmAddTask();
             makeTasksClickable();
+            enableCompleteTask();
+            Array.from(document.querySelectorAll(".task-name")).forEach(element => element.addEventListener("input", (e) => {
+                const dataDueDate = e.target.getAttribute("data-due-date");
+                if (e.target.value !== "") {
+                    document.querySelector(`[data-due-date="${dataDueDate}"][class~="confirm-add-task"]`).removeAttribute("disabled");
+                } else {
+                    document.querySelector(`[data-due-date="${dataDueDate}"][class~="confirm-add-task"]`).setAttribute("disabled", "");
+                }
+            }));
+            Array.from(document.querySelectorAll(".confirm-add-task")).forEach(button => {
+                const dataDueDate = button.getAttribute("data-due-date");
+                requiredFieldAlert(button, `[data-due-date="${dataDueDate}"][class="message"]`, "Please fill in task name");
+            });
+            (Array.from(document.querySelectorAll(".task")).length == 0) ? revealElements(document.querySelector("#image-container")) : removeElements(document.querySelector("#image-container"));
         };
 
         reloadFlow();
-    }
-
+        
+    };
     addEvents();
 
     const resetModal = function(dataDueDate) {
@@ -150,11 +235,11 @@ const init = function() {
         
         taskName.value = "";
         description.value = "";
-        priority.value = "";
+        priority.value = "1";
 
         if ((dataDueDate === "this-week") || (dataDueDate === "this-month")) {
             const dueDate = document.querySelector(`[data-due-date="${dataDueDate}"][class~="due-date"]`);
-            dueDate.value = "";
+            dueDate.value = today;
         };
     };
 };

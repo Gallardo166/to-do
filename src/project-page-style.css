@@ -1,0 +1,199 @@
+#project-content {
+    margin-left: 42px;
+    display: flex;
+    flex-direction: column;
+}
+
+#project-title {
+    position: fixed;
+    margin-top: 4px;
+    font-size: 2.5rem;
+    font-family: space-grotesk, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.section-name {
+    font-size: 1rem;
+}
+
+#project-title, .section-name {
+    padding: 4px;
+    appearance: none;
+    outline: none;
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    color: #d4d4d4;
+    transition: border 140ms ease-in-out;
+}
+
+#project-title:hover, .section-name:hover {
+    border: 1px solid #8e8b8b;
+    transition: border 140ms ease-in-out;
+}
+
+#project-container {
+    display: flex;
+    margin-top: 84px;
+}
+
+#project-sections {
+    width: fit-content;
+    margin-left: 24px;
+    margin-right: 24px;
+    display: flex;
+    gap: 24px;
+
+    .section {
+        width: 280px;
+
+        .section-header {
+            margin: 12px 0;
+            display: flex;
+            justify-content: start;
+            gap: 36px;
+        }
+
+        .delete-section-button {
+            display: flex;
+            align-items: center;
+            
+            img {
+                width: 24px;
+            }
+        }
+
+        .add-task-button {
+            padding: 0;
+            display: flex;
+            justify-content: flex-start;
+            gap: 8px;
+        }
+
+        .tasks {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+    }
+
+    .task-container:last-child {
+        margin-bottom: 8px;
+    }
+}
+
+.project-page-task-info-modal:not(.removed), #section-info-modal:not(.removed) {
+    box-sizing: border-box;
+    width: 280px;
+    margin-right: 36px;
+    padding: 12px 24px 16px 16px;
+    border: 0.4px solid #837e7e;
+    border-radius: 5px;
+
+    .task-name, .description, .priority, .due-date, #section-name {
+        width: 100%;
+        outline: 0px;
+        border: none;
+        background: none;
+        caret-color: #d4d4d4;
+        color: #d4d4d4;
+    }
+
+    .task-name, #section-name {
+        padding: 8px 5px 0 5px;
+        font-size: 1rem;
+        font-family: satoshi-medium, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+
+    .description {
+        box-sizing: border-box;
+        height: 8vh;
+        resize: none;
+        padding: 0 16px 0 5px;
+        margin-bottom: 12px;
+        font-size: 0.9rem;
+    }
+
+    hr {
+        margin: 8px 0;
+        border: 0.1px solid #837e7e;
+    }
+
+    .extra-task-info {
+        width: 60%;
+        display: flex;
+        flex-direction: column;
+        gap:4px;
+    }
+
+    .priority-container {
+        display: flex;
+        gap: 8px;
+        color: #d4d4d4;
+        font-size: 0.9rem;
+        align-items: center;
+    }
+
+    .priority, .due-date {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 3px;
+        border: 0.4px solid #837e7e;
+        border-radius: 3px;
+    }
+
+    .due-date::-webkit-calendar-picker-indicator {
+        filter: invert(98%) sepia(0%) saturate(2388%) hue-rotate(183deg) brightness(109%) contrast(66%);
+    }
+
+    .task-info-modal-buttons button, #cancel-add-section, #confirm-add-section {
+        margin-top: 16px;
+        padding: 5px;
+        color: #d4d4d4;
+        background-color: #444343;
+        border-radius: 5px;
+    }
+
+    .task-info-modal-buttons button:hover, #cancel-add-section:hover, #confirm-add-section:hover {
+        background-color:#5b5a5a;
+        transition: background-color 140ms ease-in-out;
+    }
+
+    .task-info-modal-buttons button[disabled], #confirm-add-section[disabled] {
+        color:#a6a6a6;
+        background-color: #353333;
+        cursor: not-allowed;
+    }
+
+    .task-info-modal-buttons button[disabled]:hover .message, #confirm-add-section[disabled]:hover #message {
+        display: block;
+        margin-left: 14px;
+        padding: 0 2px;
+    }
+
+    .message, #message {
+        display: none;
+        position: absolute;
+        color:#d4d4d4;
+        background-color: #212020;
+        border: 1px solid #837e7e;
+    }
+}
+
+#add-section {
+    padding-right: 24px;
+
+    #add-section-button {
+        padding: 0;
+        width: 280px;
+        display: flex;
+        align-items: center;
+    }
+
+    #section-info-modal {
+        margin-top: -4px;
+    }
+}
+
+.overdue {
+    border-color: #a73d3d;;
+}

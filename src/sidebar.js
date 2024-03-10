@@ -1,8 +1,10 @@
-import { hideElements, revealElements, removeElements, loadTasks, loadProjectsToSidebar } from "./dom";
+import "./sidebar-style.css";
+import { hideElements, revealElements, removeElements, loadTasks, loadProjectsToSidebar, requiredFieldAlert } from "./dom";
 import TaskManager from "./tasks";
 import initProjectPage from "./project-page";
 import initTodayPage from "./today-page";
 import initUpcomingPage from "./upcoming-page";
+import { format, add } from "date-fns";
 
 const closeSidebar = function() {
     const sidebar = document.querySelector("#sidebar");
@@ -25,7 +27,6 @@ const addEvents = function() {
     const projectName = document.querySelector("#project-name");
     const todayButton = document.querySelector("#today");
     const upcomingButton = document.querySelector("#upcoming");
-    const dashboardButton = document.querySelector("#dashboard");
 
     closeSidebarButton.addEventListener("click", () => {
         closeSidebar();
@@ -49,6 +50,8 @@ const addEvents = function() {
 
     addProjectButton.addEventListener("click", () => {
         revealElements(addProjectModal);
+        projectName.focus();
+        confirmAddProjectButton.setAttribute("disabled", "");
     });
 
     cancelAddProjectButton.addEventListener("click", (e) => {
@@ -62,10 +65,17 @@ const addEvents = function() {
         TaskManager.createProject(projectName.value);
         loadProjectsToSidebar(projectList);
         enableDelete();
+        enableClickOut();
         makeProjectsClickable();
         initProjectPage(projectName.value);
         projectName.value = "";
         e.preventDefault();
+    });
+
+    projectName.addEventListener("input", (e) => {
+        if (e.target.value !== "" && !TaskManager.checkRepeatedProjectName(e.target.value)) {
+            confirmAddProjectButton.removeAttribute("disabled");
+        } else confirmAddProjectButton.setAttribute("disabled", "");
     });
 
     const enableDelete = function() {
@@ -76,9 +86,19 @@ const addEvents = function() {
             initTodayPage();
             loadProjectsToSidebar(projectList);
             enableDelete();
+            enableClickOut();
             makeProjectsClickable();
             e.preventDefault();
         }));
+    };
+
+    const enableClickOut = function() {
+        document.addEventListener("click", (e) => {
+            if (e.target.getAttribute("data-open") !== "add project modal") {
+                removeElements(addProjectModal);
+                projectName.value = "";
+            };
+        });
     };
 
     const makeProjectsClickable = function() {
@@ -90,11 +110,17 @@ const addEvents = function() {
 
     loadProjectsToSidebar(projectList);
     enableDelete();
+    enableClickOut();
     makeProjectsClickable();
 };
 
 const init = function() {
+    const confirmAddProjectButton = document.querySelector("#confirm-add-project")
+    const date = document.querySelector("#date");
+    date.textContent = format(new Date(), "dd");
+
     addEvents();
-}
+    requiredFieldAlert(confirmAddProjectButton, "#sidebar-message", "Project names can't be empty or same")
+};
 
 export default init;
