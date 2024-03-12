@@ -16,3 +16,4 @@ Concepts reinforced:
 Things to improve on:
 1. Prior planning of project components
 2. Code organisation - not fully clean
+3. Mobile responsiveness
