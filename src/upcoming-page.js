@@ -33,7 +33,7 @@ const init = function() {
         if (isThisMonth(sub(pageMonth, { months: 1 }))) {
           loadCurrentMonth(today);
         } else if (isBefore(pageMonth, add(today, { months: 1 }))) {
-          loadPastMonth(today, sub(pageMonth, { months: 1 }));
+          loadPastMonth(sub(pageMonth, { months: 1 }));
         } else {
           loadFutureMonth(today, sub(pageMonth, { months: 1 }));
         }
