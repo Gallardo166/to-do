@@ -12,6 +12,7 @@ import {
   isThisWeek,
   isThisMonth,
   isSameMonth,
+  startOfMonth,
   endOfWeek,
   endOfMonth,
   format,
@@ -599,7 +600,10 @@ const loadFutureMonth = function(today, month) {
                     <p>This Month</p>
                     <div id="this-month-tasks"></div>
                     <button data-open="add task modal" data-due-date="${month}" class="add-task-button">
-                        <img data-open="add task modal" data-due-date="${month}" src=${PlusIcon} alt="Plus">
+                        <div data-open="add task modal" data-due-date="${month}" class="add-task-button-img-container">
+                            <img data-open="add task modal" data-due-date="${month}" src=${PlusIcon} class="add-task-button-img" alt="Plus">
+                        </div>
+                         <p data-open="add task modal" data-due-date="${month}" class="add-task-label">Add task</p>
                     </button>
                     <div data-open="add task modal" data-due-date="${month}" class="upcoming-page-task-info-modal removed">
                         <form data-open="add task modal">
@@ -611,7 +615,7 @@ const loadFutureMonth = function(today, month) {
                                     <label data-open="add task modal" for="priority">Priority</label>
                                     <input data-open="add task modal" data-due-date="${month}" class="priority" type="number" min="1" max="5" value="1" />
                                 </div>
-                                <input data-open="add task modal" data-due-date="${month}" class="due-date" type="date" value="${today}" min="${today}" max="${format(endOfMonth(today), "yyyy-MM-dd")}" />
+                                <input data-open="add task modal" data-due-date="${month}" class="due-date" type="date" value="${format(startOfMonth(month), "yyyy-MM-dd")}" min="${format(startOfMonth(month), "yyyy-MM-dd")}" max="${format(endOfMonth(month), "yyyy-MM-dd")}" />
                                 <select data-open="add task modal" data-due-date="${month}" data-open="add task modal" class="select-project"></select>
                             </div>
                             <div data-open="add task modal" data-due-date="${month}" class="task-info-modal-buttons">
